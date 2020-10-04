@@ -18,7 +18,7 @@ const loadCamera = (source: CameraInputSource) =>
 export default function useCamera(inputSource: InputSource) {
   return useResource(
     useCallback(
-      () => (isCameraSource(inputSource) ? loadCamera(inputSource) : null),
+      async () => (isCameraSource(inputSource) ? loadCamera(inputSource) : null),
       [inputSource]
     )
   );

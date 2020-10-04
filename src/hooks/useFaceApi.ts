@@ -57,7 +57,7 @@ export default function useFaceApi<
         ApplyWithExpressions<BaseFaceApiTask<AllFaces>, WithExpressions>,
         WithAgeAndGender
       >);
-      return Array.isArray(result) ? result : [result];
+      return !result ? null : Array.isArray(result) ? result : [result];
     }
     return { apply: applyModel };
     // eslint-disable-next-line react-hooks/exhaustive-deps

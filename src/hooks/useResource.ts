@@ -1,7 +1,7 @@
 import * as React from "react";
 
 export interface Resource<T> {
-  resource: T;
+  resource: T | null;
   error: null | Error;
   loading: boolean;
   lastStart: Date;

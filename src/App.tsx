@@ -50,7 +50,7 @@ export function InputLayer({ source, videoRef }: InputLayerProps) {
 export function ResultLayer({
   results: { resource: output, loading, lastStart, lastEnd }
 }: {
-  results: Resource<faceApi.FaceDetection[]>;
+  results: Resource<faceApi.FaceDetection[] | null>;
 }) {
   return (
     <div className="absolute inset-0 text-center">
@@ -73,7 +73,7 @@ export function ControlsLayer({
   hardware: Resource<HardwareInfo>;
   onShoot: () => any;
 }) {
-  const hasMultipleCameras = hardware.resource?.cameras.length > 1;
+  const hasMultipleCameras = (hardware.resource?.cameras.length || 0) > 1;
   return (
     <>
       <div className="absolute inset-x-0 bottom-0 text-center mb-4 ml-4">
@@ -120,7 +120,8 @@ export default function App() {
   const model = useFaceApi(initialFaceApiSettings);
   const [input, setInput] = React.useState<HTMLCanvasElement | null>(null);
   const setInputFromMedia = React.useCallback(() => {
-    setInput(createCanvasFromMediaOrNull(videoRef.current));
+    const media = videoRef.current;
+    setInput(media && createCanvasFromMediaOrNull(media));
   }, []);
   React.useEffect(() => {
     if (!autoPlay) setInput(null);
