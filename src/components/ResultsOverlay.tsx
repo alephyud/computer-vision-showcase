@@ -26,7 +26,7 @@ export function FaceExpressions({ expressions }: FaceExpressionsProps) {
         width: "100%",
         display: "flex",
         flexDirection: "row",
-        textAlign: "center"
+        textAlign: "center",
       }}
     >
       <FaceBar size={expressions.neutral} emoji="😐" color="LightGray" />
@@ -56,7 +56,7 @@ interface ResultsOverlayProps {
 export default function ResultsOverlay({
   data,
   width,
-  height
+  height,
 }: ResultsOverlayProps) {
   const resizedData =
     width && height ? faceapi.resizeResults(data, { width, height }) : data;
@@ -70,7 +70,7 @@ export default function ResultsOverlay({
             left: detection.box.x,
             width: detection.box.width,
             top: detection.box.y,
-            height: detection.box.height
+            height: detection.box.height,
           }}
         >
           <div className="bg-opacity-50 bg-white px-1 rounded-t">

@@ -59,3 +59,10 @@ typings/
 
 # dotenv environment variables file
 .env
+
+# Build output
+build
+
+# File auto-generated during dev build
+# https://github.com/facebook/create-react-app/issues/6560
+/src/react-app-env.d.ts

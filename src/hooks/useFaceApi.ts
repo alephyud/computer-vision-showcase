@@ -39,7 +39,7 @@ export default function useFaceApi<
   const getNeuralNetwork = React.useCallback(async () => {
     const { nets } = faceApi;
     const models: faceApi.NeuralNetwork<unknown>[] = [
-      tiny ? nets.tinyFaceDetector : nets.ssdMobilenetv1
+      tiny ? nets.tinyFaceDetector : nets.ssdMobilenetv1,
     ];
     if (withExpressions) models.push(nets.faceExpressionNet);
     if (withAgeAndGender) models.push(nets.ageGenderNet);
@@ -48,6 +48,7 @@ export default function useFaceApi<
       ? new faceApi.TinyFaceDetectorOptions()
       : new faceApi.SsdMobilenetv1Options();
     async function applyModel(input: faceApi.TNetInput) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let task: any = (allFaces
         ? faceApi.detectAllFaces
         : faceApi.detectSingleFace)(input, opts);

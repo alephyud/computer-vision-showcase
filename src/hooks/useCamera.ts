@@ -11,14 +11,15 @@ const loadCamera = (source: CameraInputSource) =>
   navigator.mediaDevices.getUserMedia({
     audio: false,
     video: {
-      facingMode: source === "frontalCamera" ? "user" : "environment"
-    }
+      facingMode: source === "frontalCamera" ? "user" : "environment",
+    },
   });
 
 export default function useCamera(inputSource: InputSource) {
   return useResource(
     useCallback(
-      async () => (isCameraSource(inputSource) ? loadCamera(inputSource) : null),
+      async () =>
+        isCameraSource(inputSource) ? loadCamera(inputSource) : null,
       [inputSource]
     )
   );

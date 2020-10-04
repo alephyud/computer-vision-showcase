@@ -17,7 +17,7 @@ const hasWebGl = !!document.createElement("canvas").getContext("webgl", {
   preserveDrawingBuffer: false,
   depth: false,
   stencil: false,
-  failIfMajorPerformanceCaveat: true
+  failIfMajorPerformanceCaveat: true,
 });
 
 export interface HardwareInfo {

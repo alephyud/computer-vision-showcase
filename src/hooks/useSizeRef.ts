@@ -12,7 +12,7 @@ export default function useSizeRef<E extends HTMLElement>(): [
   const ref = React.useRef<E>(null);
   const [size, setSize] = React.useState<{ width: number; height: number }>({
     width: 640,
-    height: 480
+    height: 480,
   });
   React.useEffect(() => {
     function refreshSize() {

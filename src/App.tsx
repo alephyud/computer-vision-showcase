@@ -2,7 +2,7 @@ import React from "react";
 import SettingsMenu from "./components/SettingsMenu";
 import useCamera, { isCameraSource } from "./hooks/useCamera";
 import useHardwareCapabilities, {
-  HardwareInfo
+  HardwareInfo,
 } from "./hooks/useHardwareCapabilities";
 import useSizeRef from "./hooks/useSizeRef";
 import useFaceApi from "./hooks/useFaceApi";
@@ -48,7 +48,7 @@ export function InputLayer({ source, videoRef }: InputLayerProps) {
 }
 
 export function ResultLayer({
-  results: { resource: output, loading, lastStart, lastEnd }
+  results: { resource: output, loading, lastStart, lastEnd },
 }: {
   results: Resource<faceApi.FaceDetection[] | null>;
 }) {
@@ -66,12 +66,12 @@ export function ControlsLayer({
   autoPlay,
   isReady,
   hardware,
-  onShoot
+  onShoot,
 }: {
   autoPlay: boolean;
   isReady: boolean;
   hardware: Resource<HardwareInfo>;
-  onShoot: () => any;
+  onShoot: () => void;
 }) {
   const hasMultipleCameras = (hardware.resource?.cameras.length || 0) > 1;
   return (
@@ -99,7 +99,7 @@ const initialFaceApiSettings = {
   tiny: true,
   allFaces: false,
   withAgeAndGender: false,
-  withExpressions: false
+  withExpressions: false,
 };
 
 function createCanvasFromMediaOrNull(

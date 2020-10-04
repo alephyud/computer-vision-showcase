@@ -9,7 +9,7 @@ interface Props {
 }
 
 const CamerasInfoView: React.FC<{ cameras: HardwareInfo["cameras"] }> = ({
-  cameras
+  cameras,
 }) => (
   <div>
     You have {cameras.length} camera{cameras.length !== 1 && "s"}
@@ -17,7 +17,7 @@ const CamerasInfoView: React.FC<{ cameras: HardwareInfo["cameras"] }> = ({
 );
 
 const HardwareInfoView: React.FC<{ hardwareInfo: HardwareInfo }> = ({
-  hardwareInfo
+  hardwareInfo,
 }) => (
   <>
     <div>
