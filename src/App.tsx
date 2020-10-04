@@ -6,11 +6,12 @@ import useHardwareCapabilities, {
 } from "./hooks/useHardwareCapabilities";
 import useSizeRef from "./hooks/useSizeRef";
 import useFaceApi from "./hooks/useFaceApi";
-import { InputSource } from "./types";
+import { FaceResult, InputSource } from "./types";
 import useResource, { Resource } from "./hooks/useResource";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCamera, faSyncAlt } from "@fortawesome/free-solid-svg-icons";
 import * as faceApi from "face-api.js";
+import FaceDetectionResults from "./components/FaceDetectionResults";
 
 const rafPromise = () => new Promise((res) => requestAnimationFrame(res));
 
@@ -49,14 +50,21 @@ export function InputLayer({ source, videoRef }: InputLayerProps) {
 
 export function ResultLayer({
   results: { resource: output, loading, lastStart, lastEnd },
+  width,
+  height,
 }: {
-  results: Resource<faceApi.FaceDetection[] | null>;
+  results: Resource<FaceResult[] | null>;
+  width?: number;
+  height?: number;
 }) {
   return (
     <div className="absolute inset-0 text-center">
       {loading && "Working..."}
       {!loading && output && (
         <div>Done in {(lastEnd.getTime() - lastStart.getTime()) / 1000}s</div>
+      )}
+      {output && (
+        <FaceDetectionResults results={output} width={width} height={height} />
       )}
     </div>
   );
@@ -97,9 +105,9 @@ export function ControlsLayer({
 
 const initialFaceApiSettings = {
   tiny: true,
-  allFaces: false,
-  withAgeAndGender: false,
-  withExpressions: false,
+  allFaces: true,
+  withAgeAndGender: true,
+  withExpressions: true,
 };
 
 function createCanvasFromMediaOrNull(
@@ -136,7 +144,11 @@ export default function App() {
   return (
     <div className="h-full relative">
       <InputLayer videoRef={videoRef} source="frontalCamera" />
-      <ResultLayer results={output} />
+      <ResultLayer
+        results={output}
+        width={videoRef.current?.clientWidth}
+        height={videoRef.current?.clientHeight}
+      />
       <ControlsLayer
         autoPlay={autoPlay}
         hardware={hardware}

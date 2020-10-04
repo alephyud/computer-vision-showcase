@@ -11,18 +11,14 @@ const ensureModels = async (nets: faceApi.NeuralNetwork<unknown>[]) =>
     )
   );
 
-export type BaseFaceApiTask<AllFaces extends boolean> = AllFaces extends true
-  ? faceApi.DetectAllFacesTask
-  : faceApi.DetectSingleFaceTask;
-
 export type ApplyWithExpressions<
-  T,
-  WithExpressions extends boolean
+  WithExpressions extends boolean,
+  T
 > = WithExpressions extends true ? faceApi.WithFaceExpressions<T> : T;
 
 export type ApplyWithAgeAndGender<
-  T,
-  WithAgeAndGender extends boolean
+  WithAgeAndGender extends boolean,
+  T
 > = WithAgeAndGender extends true ? faceApi.WithAge<faceApi.WithGender<T>> : T;
 
 export default function useFaceApi<
@@ -52,13 +48,21 @@ export default function useFaceApi<
       let task: any = (allFaces
         ? faceApi.detectAllFaces
         : faceApi.detectSingleFace)(input, opts);
-      if (withExpressions) task = task.withFaceExpressions(tiny);
+      if (withExpressions) task = task.withFaceExpressions();
       if (withAgeAndGender) task = task.withAgeAndGender();
-      const result = await (task as ApplyWithAgeAndGender<
-        ApplyWithExpressions<BaseFaceApiTask<AllFaces>, WithExpressions>,
-        WithAgeAndGender
-      >);
-      return !result ? null : Array.isArray(result) ? result : [result];
+      let result = await task;
+      result = !result ? [] : Array.isArray(result) ? result : [result];
+      if (!withExpressions || !withAgeAndGender)
+        result = result.map((rec: faceApi.FaceDetection) => ({
+          detection: rec,
+        }));
+      return result as ApplyWithAgeAndGender<
+        WithAgeAndGender,
+        ApplyWithExpressions<
+          WithExpressions,
+          { detection: faceApi.FaceDetection }
+        >
+      >[];
     }
     return { apply: applyModel };
     // eslint-disable-next-line react-hooks/exhaustive-deps

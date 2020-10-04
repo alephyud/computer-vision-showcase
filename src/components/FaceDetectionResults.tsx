@@ -1,5 +1,6 @@
-import * as faceapi from "face-api.js";
-import * as React from "react";
+import React from "react";
+import * as faceApi from "face-api.js";
+import { FaceResult } from "../types";
 
 interface FaceBarProps {
   size: number;
@@ -16,7 +17,7 @@ function FaceBar({ size, emoji, color }: FaceBarProps) {
 }
 
 interface FaceExpressionsProps {
-  expressions: faceapi.FaceExpressions;
+  expressions: faceApi.FaceExpressions;
 }
 
 export function FaceExpressions({ expressions }: FaceExpressionsProps) {
@@ -40,45 +41,47 @@ export function FaceExpressions({ expressions }: FaceExpressionsProps) {
   );
 }
 
-export type FaceResult = {
-  detection: faceapi.FaceDetection;
-  age: number;
-  gender: faceapi.Gender;
-  expressions: faceapi.FaceExpressions;
-}[];
-
 interface ResultsOverlayProps {
-  data: FaceResult;
+  results: FaceResult[];
   width?: number;
   height?: number;
 }
 
-export default function ResultsOverlay({
-  data,
+const FaceOverlay: React.FC<{ result: FaceResult }> = ({
+  result: { detection, expressions, gender, age },
+}) => (
+  <div
+    className="border-4 border-white absolute rounded-lg"
+    style={{
+      left: detection.box.x,
+      width: detection.box.width,
+      top: detection.box.y,
+      height: detection.box.height,
+    }}
+  >
+    {age != null && gender && (
+      <div className="bg-opacity-50 bg-white px-1 rounded-t">
+        {Math.round(age)}, {gender}
+      </div>
+    )}
+    {expressions && <FaceExpressions expressions={expressions} />}
+  </div>
+);
+
+export default function FaceDetectionResults({
+  results,
   width,
   height,
 }: ResultsOverlayProps) {
-  const resizedData =
-    width && height ? faceapi.resizeResults(data, { width, height }) : data;
+  const resizedResults =
+    width && height
+      ? faceApi.resizeResults(results, { width, height })
+      : results;
   return (
-    <div className="absolute inlet-0">
-      {resizedData.map(({ detection, expressions, gender, age }, i) => (
-        <div
-          key={i}
-          className="border-4 border-white absolute rounded-lg"
-          style={{
-            left: detection.box.x,
-            width: detection.box.width,
-            top: detection.box.y,
-            height: detection.box.height,
-          }}
-        >
-          <div className="bg-opacity-50 bg-white px-1 rounded-t">
-            {Math.round(age)}, {gender}
-          </div>
-          <FaceExpressions expressions={expressions} />
-        </div>
+    <>
+      {resizedResults.map((result, index) => (
+        <FaceOverlay key={index} result={result} />
       ))}
-    </div>
+    </>
   );
 }
