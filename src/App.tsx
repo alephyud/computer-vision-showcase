@@ -160,13 +160,12 @@ export default function App() {
   const [inputSource, setInputSource] = React.useState<InputSource>(
     "frontalCamera"
   );
-  const toggleCamera = React.useCallback(
-    () =>
-      setInputSource((vs) =>
-        vs === "frontalCamera" ? "backCamera" : "frontalCamera"
-      ),
-    []
-  );
+  const toggleCamera = React.useCallback(() => {
+    setInputSource((source) =>
+      source === "backCamera" ? "frontalCamera" : "backCamera"
+    );
+    setInput(null);
+  }, []);
   const [faceApiParams, setFaceApiParams] = React.useState<FaceApiParams>({
     tiny: true,
     allFaces: true,
@@ -190,7 +189,7 @@ export default function App() {
   const output = useResource(processInput, {
     // NN calculations are done in the main thread. We add a brief delay period before start
     // to be able to show in the UI that the result is being computed
-    delay: model.resource ? 100 : undefined,
+    delay: model.resource && input ? 100 : undefined,
   });
   return (
     <div className="h-full relative">
