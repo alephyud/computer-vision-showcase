@@ -1,9 +1,7 @@
 import React from "react";
 import SettingsMenu from "./components/SettingsMenu";
 import useCamera, { isCameraSource } from "./hooks/useCamera";
-import useHardwareCapabilities, {
-  HardwareInfo,
-} from "./hooks/useHardwareCapabilities";
+import useHardwareCapabilities from "./hooks/useHardwareCapabilities";
 import useSizeRef from "./hooks/useSizeRef";
 import useFaceApi, { FaceApiParams } from "./hooks/useFaceApi";
 import { FaceResult, InputSource } from "./types";
@@ -19,41 +17,41 @@ import FaceDetectionResults from "./components/FaceDetectionResults";
 
 export interface InputLayerProps {
   source: InputSource;
-  videoRef: React.RefObject<HTMLVideoElement>;
+  mediaRef: React.RefObject<HTMLVideoElement>;
 }
 
-export function InputLayer({ source, videoRef }: InputLayerProps) {
+export function InputLayer({ source, mediaRef }: InputLayerProps) {
   const camera = useCamera(source);
   const [containerRef, { width, height }] = useSizeRef<HTMLDivElement>();
-  const [videoAspectRatio, setVideoAspectRatio] = React.useState(1.0);
+  const [mediaAspectRatio, setMediaAspectRatio] = React.useState(1.0);
   const containerAspectRatio = width / height;
   React.useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    video.srcObject = camera.resource;
-  }, [videoRef, camera.resource]);
-  const [videoWidth, videoHeight] =
-    containerAspectRatio > videoAspectRatio
-      ? // container wider than video - same height
-        [height * videoAspectRatio, height]
-      : // container narrower than video - same width
-        [width, width / videoAspectRatio];
+    const media = mediaRef.current;
+    if (!media) return;
+    media.srcObject = camera.resource;
+  }, [mediaRef, camera.resource]);
+  const [mediaWidth, mediaHeight] =
+    containerAspectRatio > mediaAspectRatio
+      ? // container wider than media - same height
+        [height * mediaAspectRatio, height]
+      : // container narrower than media - same width
+        [width, width / mediaAspectRatio];
   return (
     <div className="absolute inset-0 text-center bg-black" ref={containerRef}>
       {isCameraSource(source) && (
         <video
-          ref={videoRef}
-          onCanPlay={() => videoRef.current?.play()}
+          ref={mediaRef}
+          onCanPlay={() => mediaRef.current?.play()}
           autoPlay
           playsInline
           muted
-          width={videoWidth}
-          height={videoHeight}
+          width={mediaWidth}
+          height={mediaHeight}
           className="absolute top-0"
-          // Centre the video horizontally
-          style={{ left: "50%", marginLeft: -videoWidth / 2 }}
+          // Centre the media horizontally
+          style={{ left: "50%", marginLeft: -mediaWidth / 2 }}
           onLoadedMetadata={({ currentTarget: t }) =>
-            setVideoAspectRatio(t.videoWidth / t.videoHeight)
+            setMediaAspectRatio(t.videoWidth / t.videoHeight)
           }
         />
       )}
@@ -73,7 +71,7 @@ export function ResultLayer({
   return (
     <div
       className="absolute top-0 text-center"
-      // Centre horizontally to align with the video
+      // Centre horizontally to align with the input media
       style={{ left: "50%", marginLeft: -(width || 0) / 2, width, height }}
     >
       <div>
@@ -96,41 +94,49 @@ export function ControlsLayer({
   autoPlay,
   isReady,
   isWorking,
-  hardware,
+  toggleCamera,
   onShoot,
 }: {
   autoPlay: boolean;
   isReady: boolean;
   isWorking: boolean;
-  hardware: Resource<HardwareInfo>;
+  toggleCamera?: () => void;
   onShoot: () => void;
 }) {
-  const hasMultipleCameras = (hardware.resource?.cameras.length || 0) > 1;
+  /**
+   * Buttons absolutely positioned (near the bottom of the screen), with limited
+   * max width on wide screens: https://stackoverflow.com/a/24859531/4534687
+   * leading-none (line-height=1) is needed to make the buttons circular not elliptical
+   **/
+  const containerClass =
+    "absolute inline-block bottom-0 inset-x-0 mx-auto my-4 px-4 w-full max-w-sm leading-none";
   return (
     <>
-      {/* Buttons absolutely positioned (near the bottom of the screen),
-          with limited max width on wide screens
-          https://stackoverflow.com/a/24859531/4534687 */}
-      <div className="absolute inline-block bottom-0 inset-x-0 text-center mx-auto my-4 px-4 w-full max-w-sm">
-        {hasMultipleCameras && (
-          <button className="bg-indigo-800 rounded px-2 py-1 text-white float-left">
-            <FontAwesomeIcon icon={faSyncAlt} />
-          </button>
-        )}
-        {!autoPlay && isReady && (
-          <button
-            className={`bg-red-${
-              isWorking ? 600 : 800
-            } rounded px-2 py-1 text-white`}
-            disabled={isWorking}
-            onClick={onShoot}
-          >
-            <FontAwesomeIcon
-              icon={isWorking ? faCircleNotch : faCamera}
-              spin={isWorking}
-            />
-          </button>
-        )}
+      <div className={containerClass}>
+        <div className="w-1/3 inline-block text-left">
+          {toggleCamera && (
+            <button className="bg-indigo-800 rounded-full p-2 text-white">
+              <FontAwesomeIcon icon={faSyncAlt} onClick={toggleCamera} />
+            </button>
+          )}
+        </div>
+        <div className="w-1/3 inline-block text-center">
+          {!autoPlay && isReady && (
+            <button
+              className={`bg-red-${
+                isWorking ? 600 : 800
+              } rounded-full p-2 text-white`}
+              disabled={isWorking}
+              onClick={onShoot}
+            >
+              <FontAwesomeIcon
+                icon={isWorking ? faCircleNotch : faCamera}
+                spin={isWorking}
+              />
+            </button>
+          )}
+        </div>
+        <div className="w-1/3 inline-block bg-black" />
       </div>
     </>
   );
@@ -149,8 +155,17 @@ function createCanvasFromMediaOrNull(
 
 export default function App() {
   const hardware = useHardwareCapabilities();
-  const videoRef = React.useRef<HTMLVideoElement>(null);
-  const [autoPlay, setAutoPlay] = React.useState(!!hardware.resource?.hasWebGl);
+  const hasMultipleCameras = (hardware.resource?.cameras.length || 0) > 1;
+  const mediaRef = React.useRef<HTMLVideoElement>(null);
+  const [inputSource, setInputSource] = React.useState<InputSource>(
+    "frontalCamera"
+  );
+  const toggleCamera = React.useCallback(() => {
+    setInputSource((source) =>
+      source === "backCamera" ? "frontalCamera" : "backCamera"
+    );
+    setInput(null);
+  }, []);
   const [faceApiParams, setFaceApiParams] = React.useState<FaceApiParams>({
     tiny: true,
     allFaces: true,
@@ -160,12 +175,13 @@ export default function App() {
   const model = useFaceApi(faceApiParams);
   const [input, setInput] = React.useState<HTMLCanvasElement | null>(null);
   const setInputFromMedia = React.useCallback(() => {
-    const media = videoRef.current;
+    const media = mediaRef.current;
     setInput(media && createCanvasFromMediaOrNull(media));
   }, []);
+  const [autoPlay, setAutoPlay] = React.useState(!!hardware.resource?.hasWebGl);
   React.useEffect(() => {
     if (!autoPlay) setInput(null);
-  }, [autoPlay, videoRef, model.resource]);
+  }, [autoPlay, mediaRef, model.resource]);
   const processInput = React.useCallback(async () => {
     if (!input || !model.resource) return null;
     return model.resource.apply(input);
@@ -173,21 +189,21 @@ export default function App() {
   const output = useResource(processInput, {
     // NN calculations are done in the main thread. We add a brief delay period before start
     // to be able to show in the UI that the result is being computed
-    delay: model.resource ? 100 : undefined,
+    delay: model.resource && input ? 100 : undefined,
   });
   return (
     <div className="h-full relative">
-      <InputLayer videoRef={videoRef} source="frontalCamera" />
+      <InputLayer mediaRef={mediaRef} source={inputSource} />
       <ResultLayer
         results={output}
-        width={videoRef.current?.clientWidth}
-        height={videoRef.current?.clientHeight}
+        width={mediaRef.current?.clientWidth}
+        height={mediaRef.current?.clientHeight}
       />
       <ControlsLayer
         autoPlay={autoPlay}
-        hardware={hardware}
+        toggleCamera={hasMultipleCameras ? toggleCamera : undefined}
         isWorking={output.loading}
-        isReady={!!videoRef.current && !!model.resource}
+        isReady={!!mediaRef.current && !!model.resource}
         onShoot={setInputFromMedia}
       />
       {hardware.resource && (

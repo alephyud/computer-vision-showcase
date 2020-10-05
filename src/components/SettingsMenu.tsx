@@ -67,7 +67,7 @@ export default function SettingsMenu({
     // Load local state from outer component's state
     localTiny[1](faceApiParams.tiny);
     localAllFaces[1](faceApiParams.allFaces);
-    localWithExpressions[1](faceApiParams.withAgeAndGender);
+    localWithExpressions[1](faceApiParams.withExpressions);
     localWithAgeAndGender[1](faceApiParams.withAgeAndGender);
     localAutoPlay[1](autoPlay);
     setAutoPlay(false);
@@ -108,7 +108,7 @@ export default function SettingsMenu({
         <HardwareInfoView hardwareInfo={hardwareInfo} />
       </div>
       <button
-        className="fixed top-0 bg-gray-200 px-2 pt-1 rounded-r-lg transition-all duration-500 ease-in-out"
+        className="fixed top-0 bg-gray-200 p-2 leading-none rounded-r-lg transition-all duration-500 ease-in-out"
         style={{ left: shown ? menuWidth : 0 }}
         onClick={shown ? saveAndClose : open}
       >
