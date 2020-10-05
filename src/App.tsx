@@ -112,7 +112,7 @@ export function ControlsLayer({
           with limited max width on wide screens
           https://stackoverflow.com/a/24859531/4534687 */}
       <div className="absolute inline-block bottom-0 inset-x-0 text-center mx-auto my-4 px-4 w-full max-w-sm">
-        {!hasMultipleCameras && (
+        {hasMultipleCameras && (
           <button className="bg-indigo-800 rounded px-2 py-1 text-white float-left">
             <FontAwesomeIcon icon={faSyncAlt} />
           </button>
