@@ -22,17 +22,22 @@ export interface InputLayerProps {
 
 export function InputLayer({ source, videoRef }: InputLayerProps) {
   const camera = useCamera(source);
-  const [containerRef, { width }] = useSizeRef<HTMLDivElement>();
+  const [containerRef, { width, height }] = useSizeRef<HTMLDivElement>();
+  const [videoAspectRatio, setVideoAspectRatio] = React.useState(1.0);
+  const containerAspectRatio = width / height;
   React.useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
     video.srcObject = camera.resource;
   }, [videoRef, camera.resource]);
+  const [videoWidth, videoHeight] =
+    containerAspectRatio > videoAspectRatio
+      ? // container wider than video - same height
+        [height * videoAspectRatio, height]
+      : // container narrower than video - same width
+        [width, width / videoAspectRatio];
   return (
-    <div
-      className="absolute inset-0 bg-blue-500 text-center"
-      ref={containerRef}
-    >
+    <div className="absolute inset-0 text-center bg-black" ref={containerRef}>
       {isCameraSource(source) && (
         <video
           ref={videoRef}
@@ -40,8 +45,14 @@ export function InputLayer({ source, videoRef }: InputLayerProps) {
           autoPlay
           playsInline
           muted
-          width={width}
-          className="absolute top-0 left-0"
+          width={videoWidth}
+          height={videoHeight}
+          className="absolute top-0"
+          // Centre the video horizontally
+          style={{ left: "50%", marginLeft: -videoWidth / 2 }}
+          onLoadedMetadata={({ currentTarget: t }) =>
+            setVideoAspectRatio(t.videoWidth / t.videoHeight)
+          }
         />
       )}
     </div>
@@ -58,14 +69,24 @@ export function ResultLayer({
   height?: number;
 }) {
   return (
-    <div className="absolute inset-0 text-center">
-      {loading && "Working..."}
-      {!loading && output && (
-        <div>Done in {(lastEnd.getTime() - lastStart.getTime()) / 1000}s</div>
-      )}
-      {output && (
-        <FaceDetectionResults results={output} width={width} height={height} />
-      )}
+    <div
+      className="absolute top-0 text-center"
+      // Centre horizontally to align with the video
+      style={{ left: "50%", marginLeft: -(width || 0) / 2, width, height }}
+    >
+      <div>
+        {loading && "Working..."}
+        {!loading && output && (
+          <div>Done in {(lastEnd.getTime() - lastStart.getTime()) / 1000}s</div>
+        )}
+        {output && (
+          <FaceDetectionResults
+            results={output}
+            width={width}
+            height={height}
+          />
+        )}
+      </div>
     </div>
   );
 }
