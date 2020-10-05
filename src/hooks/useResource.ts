@@ -10,7 +10,7 @@ export interface Resource<T> {
 
 export default function useResource<T>(
   load: () => Promise<T>,
-  cleanup?: () => void
+  { cleanup, debounce }: { cleanup?: () => void; debounce?: number } = {}
 ): Resource<T> {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<Error | null>(null);
@@ -18,10 +18,15 @@ export default function useResource<T>(
   const [lastStart, setLastStart] = React.useState(new Date());
   const [lastEnd, setLastEnd] = React.useState(new Date());
   React.useEffect(() => {
+    let debounceTimeout: number | null = null;
     const loadResource = async () => {
       setLoading(true);
       setError(null);
       setLastStart(new Date());
+      if (debounce)
+        await new Promise(
+          (res) => (debounceTimeout = window.setTimeout(res, debounce))
+        );
       try {
         setResource(await load());
       } catch (e) {
@@ -32,9 +37,11 @@ export default function useResource<T>(
       setLastEnd(new Date());
     };
     loadResource();
-    if (cleanup) {
-      return () => cleanup();
-    }
+    return () => {
+      setLoading(false);
+      if (debounceTimeout) window.clearTimeout(debounceTimeout);
+      else if (cleanup) cleanup();
+    };
   }, [load, cleanup]);
   return { loading, error, resource, lastStart, lastEnd };
 }

@@ -5,15 +5,17 @@ import useHardwareCapabilities, {
   HardwareInfo,
 } from "./hooks/useHardwareCapabilities";
 import useSizeRef from "./hooks/useSizeRef";
-import useFaceApi from "./hooks/useFaceApi";
+import useFaceApi, { FaceApiParams } from "./hooks/useFaceApi";
 import { FaceResult, InputSource } from "./types";
 import useResource, { Resource } from "./hooks/useResource";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCamera, faSyncAlt } from "@fortawesome/free-solid-svg-icons";
-import * as faceApi from "face-api.js";
+import {
+  faCamera,
+  faCircleNotch,
+  faSyncAlt,
+} from "@fortawesome/free-solid-svg-icons";
+import { createCanvasFromMedia } from "face-api.js";
 import FaceDetectionResults from "./components/FaceDetectionResults";
-
-const rafPromise = () => new Promise((res) => requestAnimationFrame(res));
 
 export interface InputLayerProps {
   source: InputSource;
@@ -75,7 +77,6 @@ export function ResultLayer({
       style={{ left: "50%", marginLeft: -(width || 0) / 2, width, height }}
     >
       <div>
-        {loading && "Working..."}
         {!loading && output && (
           <div>Done in {(lastEnd.getTime() - lastStart.getTime()) / 1000}s</div>
         )}
@@ -94,29 +95,40 @@ export function ResultLayer({
 export function ControlsLayer({
   autoPlay,
   isReady,
+  isWorking,
   hardware,
   onShoot,
 }: {
   autoPlay: boolean;
   isReady: boolean;
+  isWorking: boolean;
   hardware: Resource<HardwareInfo>;
   onShoot: () => void;
 }) {
   const hasMultipleCameras = (hardware.resource?.cameras.length || 0) > 1;
   return (
     <>
-      <div className="absolute inset-x-0 bottom-0 text-center mb-4 ml-4">
-        {hasMultipleCameras && (
+      {/* Buttons absolutely positioned (near the bottom of the screen),
+          with limited max width on wide screens
+          https://stackoverflow.com/a/24859531/4534687 */}
+      <div className="absolute inline-block bottom-0 inset-x-0 text-center mx-auto my-4 px-4 w-full max-w-sm">
+        {!hasMultipleCameras && (
           <button className="bg-indigo-800 rounded px-2 py-1 text-white float-left">
             <FontAwesomeIcon icon={faSyncAlt} />
           </button>
         )}
         {!autoPlay && isReady && (
           <button
-            className="bg-red-800 rounded px-2 py-1 text-white"
+            className={`bg-red-${
+              isWorking ? 600 : 800
+            } rounded px-2 py-1 text-white`}
+            disabled={isWorking}
             onClick={onShoot}
           >
-            <FontAwesomeIcon icon={faCamera} />
+            <FontAwesomeIcon
+              icon={isWorking ? faCircleNotch : faCamera}
+              spin={isWorking}
+            />
           </button>
         )}
       </div>
@@ -124,18 +136,11 @@ export function ControlsLayer({
   );
 }
 
-const initialFaceApiSettings = {
-  tiny: true,
-  allFaces: true,
-  withAgeAndGender: true,
-  withExpressions: true,
-};
-
 function createCanvasFromMediaOrNull(
   media: HTMLVideoElement | HTMLImageElement | ImageData
 ) {
   try {
-    return faceApi.createCanvasFromMedia(media);
+    return createCanvasFromMedia(media);
   } catch (e) {
     // media not yet initialised
     return null;
@@ -145,8 +150,14 @@ function createCanvasFromMediaOrNull(
 export default function App() {
   const hardware = useHardwareCapabilities();
   const videoRef = React.useRef<HTMLVideoElement>(null);
-  const [autoPlay] = React.useState(false); // hardware.resource?.hasWebGl
-  const model = useFaceApi(initialFaceApiSettings);
+  const [autoPlay, setAutoPlay] = React.useState(!!hardware.resource?.hasWebGl);
+  const [faceApiParams, setFaceApiParams] = React.useState<FaceApiParams>({
+    tiny: true,
+    allFaces: true,
+    withAgeAndGender: true,
+    withExpressions: true,
+  });
+  const model = useFaceApi(faceApiParams);
   const [input, setInput] = React.useState<HTMLCanvasElement | null>(null);
   const setInputFromMedia = React.useCallback(() => {
     const media = videoRef.current;
@@ -157,11 +168,13 @@ export default function App() {
   }, [autoPlay, videoRef, model.resource]);
   const processInput = React.useCallback(async () => {
     if (!input || !model.resource) return null;
-    await rafPromise();
-    await rafPromise();
     return model.resource.apply(input);
   }, [model.resource, input]);
-  const output = useResource(processInput);
+  const output = useResource(processInput, {
+    // NN calculations are done in the main thread. We add a brief debounce period before start
+    // to be able to show in the UI that the result is being computed
+    debounce: model.resource ? 100 : undefined,
+  });
   return (
     <div className="h-full relative">
       <InputLayer videoRef={videoRef} source="frontalCamera" />
@@ -173,10 +186,16 @@ export default function App() {
       <ControlsLayer
         autoPlay={autoPlay}
         hardware={hardware}
+        isWorking={output.loading}
         isReady={!!videoRef.current && !!model.resource}
         onShoot={setInputFromMedia}
       />
-      <SettingsMenu hardwareInfo={hardware} />
+      {hardware.resource && (
+        <SettingsMenu
+          hardwareInfo={hardware.resource}
+          {...{ autoPlay, setAutoPlay, faceApiParams, setFaceApiParams }}
+        />
+      )}
     </div>
   );
 }

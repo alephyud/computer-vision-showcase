@@ -21,16 +21,22 @@ export type ApplyWithAgeAndGender<
   T
 > = WithAgeAndGender extends true ? faceApi.WithAge<faceApi.WithGender<T>> : T;
 
+export interface FaceApiParams<
+  AllFaces extends boolean = boolean,
+  WithExpressions extends boolean = boolean,
+  WithAgeAndGender extends boolean = boolean
+> {
+  tiny: boolean;
+  allFaces: AllFaces;
+  withExpressions: WithExpressions;
+  withAgeAndGender: WithAgeAndGender;
+}
+
 export default function useFaceApi<
   AllFaces extends boolean,
   WithExpressions extends boolean,
   WithAgeAndGender extends boolean
->(params: {
-  tiny: boolean;
-  allFaces: AllFaces;
-  withExpressions?: WithExpressions;
-  withAgeAndGender?: WithAgeAndGender;
-}) {
+>(params: FaceApiParams<AllFaces, WithExpressions, WithAgeAndGender>) {
   const { tiny, allFaces, withExpressions, withAgeAndGender } = params;
   const getNeuralNetwork = React.useCallback(async () => {
     const { nets } = faceApi;
@@ -65,7 +71,6 @@ export default function useFaceApi<
       >[];
     }
     return { apply: applyModel };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tiny, allFaces, withExpressions, withAgeAndGender]);
   return useResource(getNeuralNetwork);
 }
