@@ -1,8 +1,10 @@
-import { faCog, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faGithub } from "@fortawesome/free-brands-svg-icons/faGithub";
+import { faCog } from "@fortawesome/free-solid-svg-icons/faCog";
+import { faTimes } from "@fortawesome/free-solid-svg-icons/faTimes";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
-import { HardwareInfo } from "../hooks/useHardwareCapabilities";
 import { FaceApiParams } from "../hooks/useFaceApi";
+import { HardwareInfo } from "../hooks/useHardwareCapabilities";
 
 interface Props {
   hardwareInfo: HardwareInfo;
@@ -106,6 +108,14 @@ export default function SettingsMenu({
         <Checkbox state={localWithAgeAndGender}>Detect gender and age</Checkbox>
         <Checkbox state={localAllFaces}>Allow multiple faces</Checkbox>
         <HardwareInfoView hardwareInfo={hardwareInfo} />
+        <div className="mt-2">
+          <a
+            href="https://github.com/alephyud/computer-vision-showcase"
+            className="hover:underline"
+          >
+            <FontAwesomeIcon icon={faGithub} /> Source code
+          </a>
+        </div>
       </div>
       <button
         className="fixed top-0 bg-gray-200 p-2 leading-none rounded-r-lg transition-all duration-500 ease-in-out"

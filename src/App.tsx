@@ -1,19 +1,17 @@
+import { faCamera } from "@fortawesome/free-solid-svg-icons/faCamera";
+import { faCircleNotch } from "@fortawesome/free-solid-svg-icons/faCircleNotch";
+import { faSyncAlt } from "@fortawesome/free-solid-svg-icons/faSyncAlt";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { createCanvasFromMedia } from "face-api.js";
 import React from "react";
+import FaceDetectionResults from "./components/FaceDetectionResults";
 import SettingsMenu from "./components/SettingsMenu";
 import useCamera, { isCameraSource } from "./hooks/useCamera";
-import useHardwareCapabilities from "./hooks/useHardwareCapabilities";
-import useSizeRef from "./hooks/useSizeRef";
 import useFaceApi, { FaceApiParams } from "./hooks/useFaceApi";
-import { FaceResult, InputSource } from "./types";
+import useHardwareCapabilities from "./hooks/useHardwareCapabilities";
 import useResource, { Resource } from "./hooks/useResource";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCamera,
-  faCircleNotch,
-  faSyncAlt,
-} from "@fortawesome/free-solid-svg-icons";
-import { createCanvasFromMedia } from "face-api.js";
-import FaceDetectionResults from "./components/FaceDetectionResults";
+import useSizeRef from "./hooks/useSizeRef";
+import { FaceResult, InputSource } from "./types";
 
 export interface InputLayerProps {
   source: InputSource;

@@ -1,9 +1,13 @@
 {
-  "name": "react",
+  "name": "computer-vision-showcase",
   "version": "1.0.0",
-  "description": "React example starter project",
+  "description": "Computer vision showcase",
   "keywords": [
-    "computer-vision"
+    "computer-vision",
+    "tensorflow",
+    "face-api",
+    "react",
+    "react-hooks"
   ],
   "main": "src/index.js",
   "dependencies": {
@@ -16,6 +20,7 @@
     "react-scripts": "3.4.3"
   },
   "devDependencies": {
+    "@fortawesome/free-brands-svg-icons": "^5.15.1",
     "@types/react": "^16.9.50",
     "@types/react-dom": "^16.9.8",
     "@typescript-eslint/eslint-plugin": "^4.3.0",
