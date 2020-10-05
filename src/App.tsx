@@ -171,9 +171,9 @@ export default function App() {
     return model.resource.apply(input);
   }, [model.resource, input]);
   const output = useResource(processInput, {
-    // NN calculations are done in the main thread. We add a brief debounce period before start
+    // NN calculations are done in the main thread. We add a brief delay period before start
     // to be able to show in the UI that the result is being computed
-    debounce: model.resource ? 100 : undefined,
+    delay: model.resource ? 100 : undefined,
   });
   return (
     <div className="h-full relative">
