@@ -4,7 +4,7 @@ import { FaceResult } from "../types";
 import FaceDetectionResults from "./FaceDetectionResults";
 
 export default function ResultLayer({
-  results: { resource: output, loading, lastStart, lastEnd },
+  results: { resource: output, lastStart, lastEnd },
   width,
   height,
   transitions,
@@ -21,7 +21,7 @@ export default function ResultLayer({
       style={{ left: "50%", marginLeft: -(width || 0) / 2, width, height }}
     >
       <div>
-        {!loading && output && (
+        {output && (
           <>
             <div>
               {output.length} face{output.length !== 1 && "s"} | done in{" "}
