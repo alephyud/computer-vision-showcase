@@ -31,7 +31,7 @@ export default function ControlsOverlay({
       <div className={containerClass}>
         <div className="w-1/3 inline-block text-left">
           {toggleCamera && (
-            <button className="bg-indigo-800 rounded-full p-2 text-white">
+            <button className="bg-indigo-800 rounded-full p-3 text-white text-2xl">
               <FontAwesomeIcon icon={faSyncAlt} onClick={toggleCamera} />
             </button>
           )}
@@ -41,7 +41,7 @@ export default function ControlsOverlay({
             <button
               className={`bg-red-${
                 isWorking ? 600 : 800
-              } rounded-full p-2 text-white`}
+              } rounded-full p-3 text-white text-2xl`}
               disabled={isWorking}
               onClick={onShoot}
             >

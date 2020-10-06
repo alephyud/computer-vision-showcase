@@ -114,7 +114,7 @@ export default function SettingsMenu({
     <>
       {shown && <div className="fixed inset-0" onClick={saveAndClose} />}
       <div
-        className="fixed inset-y-0 bg-gray-200 p-2 transition-all duration-500 ease-in-out overflow-y-scroll"
+        className="fixed inset-y-0 bg-gray-200 p-3 transition-all duration-500 ease-in-out overflow-y-scroll"
         style={{ width: menuWidth, left: shown ? 0 : -menuWidth }}
       >
         <h2 className="my-2 text-xl">Settings</h2>
@@ -144,7 +144,7 @@ export default function SettingsMenu({
         </div>
       </div>
       <button
-        className="fixed top-0 bg-gray-200 p-2 leading-none rounded-r-lg transition-all duration-500 ease-in-out"
+        className="fixed top-0 bg-gray-200 p-2 leading-none rounded-r-lg transition-all duration-500 ease-in-out text-2xl"
         style={{ left: shown ? menuWidth : 0 }}
         onClick={shown ? saveAndClose : open}
       >
