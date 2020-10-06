@@ -54,7 +54,7 @@ export default function useFaceApi({
       if (withAgeAndGender) task = task.withAgeAndGender();
       let result = await task;
       result = !result ? [] : Array.isArray(result) ? result : [result];
-      if (!withExpressions || !withAgeAndGender)
+      if (!withExpressions && !withAgeAndGender)
         result = result.map((rec: faceApi.FaceDetection) => ({
           detection: rec,
         }));
