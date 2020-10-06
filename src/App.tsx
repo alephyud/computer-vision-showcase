@@ -8,7 +8,9 @@ import FaceDetectionResults from "./components/FaceDetectionResults";
 import SettingsMenu from "./components/SettingsMenu";
 import useCamera, { isCameraSource } from "./hooks/useCamera";
 import useFaceApi, { FaceApiParams } from "./hooks/useFaceApi";
-import useHardwareCapabilities from "./hooks/useHardwareCapabilities";
+import useHardwareCapabilities, {
+  hasWebGl,
+} from "./hooks/useHardwareCapabilities";
 import useResource, { Resource } from "./hooks/useResource";
 import useSizeRef from "./hooks/useSizeRef";
 import { FaceResult, InputSource } from "./types";
@@ -180,7 +182,7 @@ export default function App() {
     const media = mediaRef.current;
     setInput(media && createCanvasFromMediaOrNull(media));
   }, []);
-  const [autoPlay, setAutoPlay] = React.useState(!!hardware.resource?.hasWebGl);
+  const [autoPlay, setAutoPlay] = React.useState(hasWebGl);
   React.useEffect(() => setInput(null), [autoPlay, mediaRef, model.resource]);
   const processInput = React.useCallback(async () => {
     if (!input || !model.resource) return null;

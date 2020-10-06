@@ -10,7 +10,7 @@ const getCameras = async () =>
  * Check whether the device supports WebGL - this is the way Tensorflow JS does it.
  * https://github.com/tensorflow/tfjs/blob/62636fff9f01019b94d4aa338c41ce40f60412f8/tfjs-backend-webgl/src/canvas_util.ts#L20
  */
-const hasWebGl = !!document.createElement("canvas").getContext("webgl", {
+export const hasWebGl = !!document.createElement("canvas").getContext("webgl", {
   alpha: false,
   antialias: false,
   premultipliedAlpha: false,
