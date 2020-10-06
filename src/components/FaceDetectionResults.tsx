@@ -34,13 +34,13 @@ export function FaceExpressions({ expressions }: FaceExpressionsProps) {
         textAlign: "center",
       }}
     >
-      <FaceBar size={expressions.neutral} emoji="😐" color="LightGray" />
       <FaceBar size={expressions.happy} emoji="😃" color="Fuchsia" />
+      <FaceBar size={expressions.neutral} emoji="😐" color="LightGray" />
       <FaceBar size={expressions.sad} emoji="😢" color="LightBlue" />
       <FaceBar size={expressions.angry} emoji="😠" color="Red" />
+      <FaceBar size={expressions.surprised} emoji="😮" color="Cyan" />
       <FaceBar size={expressions.fearful} emoji="😱" color="Yellow" />
       <FaceBar size={expressions.disgusted} emoji="🤢" color="Green" />
-      <FaceBar size={expressions.surprised} emoji="😮" color="Cyan" />
     </div>
   );
 }
