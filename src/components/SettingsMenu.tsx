@@ -41,7 +41,7 @@ const Checkbox: React.FC<{
       <input
         type="checkbox"
         checked={value}
-        onClick={() => setValue(!value)}
+        onChange={() => setValue(!value)}
         className="mr-1"
       />
       {children}

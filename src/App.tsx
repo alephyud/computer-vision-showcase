@@ -18,7 +18,7 @@ export default function App() {
 
   // Input source - we'll add image uploads, but for now we support only camera
   const [inputSource, setInputSource] = React.useState<InputSource>(
-    "frontalCamera"
+    "imageUpload"
   );
 
   // The input for the NN is obtained from a media element inside the

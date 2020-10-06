@@ -26,7 +26,7 @@ export default function InputContainer({ source, mediaRef }: InputLayerProps) {
         [width, width / mediaAspectRatio];
   return (
     <div className="absolute inset-0 text-center bg-black" ref={containerRef}>
-      {isCameraSource(source) && (
+      {isCameraSource(source) ? (
         <video
           ref={mediaRef}
           onCanPlay={() => mediaRef.current?.play()}
@@ -41,6 +41,13 @@ export default function InputContainer({ source, mediaRef }: InputLayerProps) {
           onLoadedMetadata={({ currentTarget: t }) =>
             setMediaAspectRatio(t.videoWidth / t.videoHeight)
           }
+        />
+      ) : (
+        <img
+          ref={mediaRef as any}
+          src="/cropped.jpg"
+          width={mediaWidth}
+          height={mediaHeight}
         />
       )}
       {camera.error && (
