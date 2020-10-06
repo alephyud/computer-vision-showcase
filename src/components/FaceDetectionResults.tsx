@@ -1,5 +1,5 @@
-import React from "react";
 import * as faceApi from "face-api.js";
+import React from "react";
 import { FaceResult } from "../types";
 
 interface FaceBarProps {
@@ -8,9 +8,13 @@ interface FaceBarProps {
   color: string;
 }
 
+const TransitionsClasses = React.createContext("");
+
 function FaceBar({ size, emoji, color }: FaceBarProps) {
+  const transitionClasses = React.useContext(TransitionsClasses);
+  const style = { flex: size, backgroundColor: color };
   return (
-    <span style={{ flex: size, backgroundColor: color }}>
+    <span style={style} className={transitionClasses}>
       {size > 0.05 && emoji}
     </span>
   );
@@ -48,12 +52,13 @@ interface ResultsOverlayProps {
   transitions: boolean;
 }
 
-const FaceOverlay: React.FC<{ result: FaceResult; transitions: string }> = ({
+const FaceOverlay: React.FC<{ result: FaceResult }> = ({
   result: { detection, expressions, gender, age },
-  transitions,
 }) => (
   <div
-    className={`border-4 border-white absolute rounded-lg ${transitions}`}
+    className={`border-4 border-white absolute rounded-lg ${React.useContext(
+      TransitionsClasses
+    )}`}
     style={{
       left: detection.box.x,
       width: detection.box.width,
@@ -80,18 +85,17 @@ export default function FaceDetectionResults({
     width && height
       ? faceApi.resizeResults(results, { width, height })
       : results;
-  const transitionClass = transitions
-    ? "transition-all duration-300 ease-in-out"
-    : "";
   return (
-    <>
+    <TransitionsClasses.Provider
+      value={
+        transitions || !transitions
+          ? "transition-all duration-300 ease-in-out"
+          : ""
+      }
+    >
       {resizedResults.map((result, index) => (
-        <FaceOverlay
-          key={index}
-          result={result}
-          transitions={transitionClass}
-        />
+        <FaceOverlay key={index} result={result} />
       ))}
-    </>
+    </TransitionsClasses.Provider>
   );
 }
