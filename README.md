@@ -22,9 +22,11 @@ yarn start
 
 ## Usage
 
-Enable the camera on your device to use this app.
+You can either open the [existing demo](https://computer-vision-showcase.vercel.app/) or build and run the app locally. Enable the camera on your device to use this app.
 
 This app reimplements [a subset of face-api.js's own demos](https://justadudewhohacks.github.io/face-api.js/) using React hooks. It will detect faces in and try to guess face expressions, age and gender.
+
+![Screenshot](docs/img/screenshot.png)
 
 You can change some of the model's settings by clicking the ⚙️ button at the top of the screen:
 
