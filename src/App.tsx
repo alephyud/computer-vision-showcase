@@ -61,10 +61,12 @@ export function ResultLayer({
   results: { resource: output, loading, lastStart, lastEnd },
   width,
   height,
+  transitions,
 }: {
   results: Resource<FaceResult[] | null>;
   width?: number;
   height?: number;
+  transitions: boolean;
 }) {
   return (
     <div
@@ -81,6 +83,7 @@ export function ResultLayer({
             results={output}
             width={width}
             height={height}
+            transitions={transitions}
           />
         )}
       </div>
@@ -204,6 +207,7 @@ export default function App() {
         results={output}
         width={mediaRef.current?.clientWidth}
         height={mediaRef.current?.clientHeight}
+        transitions={autoPlay}
       />
       <ControlsLayer
         autoPlay={autoPlay}

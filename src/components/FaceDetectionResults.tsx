@@ -45,13 +45,15 @@ interface ResultsOverlayProps {
   results: FaceResult[];
   width?: number;
   height?: number;
+  transitions: boolean;
 }
 
-const FaceOverlay: React.FC<{ result: FaceResult }> = ({
+const FaceOverlay: React.FC<{ result: FaceResult; transitions: string }> = ({
   result: { detection, expressions, gender, age },
+  transitions,
 }) => (
   <div
-    className="border-4 border-white absolute rounded-lg"
+    className={`border-4 border-white absolute rounded-lg ${transitions}`}
     style={{
       left: detection.box.x,
       width: detection.box.width,
@@ -72,15 +74,23 @@ export default function FaceDetectionResults({
   results,
   width,
   height,
+  transitions,
 }: ResultsOverlayProps) {
   const resizedResults =
     width && height
       ? faceApi.resizeResults(results, { width, height })
       : results;
+  const transitionClass = transitions
+    ? "transition-all duration-300 ease-in-out"
+    : "";
   return (
     <>
       {resizedResults.map((result, index) => (
-        <FaceOverlay key={index} result={result} />
+        <FaceOverlay
+          key={index}
+          result={result}
+          transitions={transitionClass}
+        />
       ))}
     </>
   );
