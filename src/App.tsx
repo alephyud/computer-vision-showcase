@@ -8,7 +8,9 @@ import FaceDetectionResults from "./components/FaceDetectionResults";
 import SettingsMenu from "./components/SettingsMenu";
 import useCamera, { isCameraSource } from "./hooks/useCamera";
 import useFaceApi, { FaceApiParams } from "./hooks/useFaceApi";
-import useHardwareCapabilities from "./hooks/useHardwareCapabilities";
+import useHardwareCapabilities, {
+  hasWebGl,
+} from "./hooks/useHardwareCapabilities";
 import useResource, { Resource } from "./hooks/useResource";
 import useSizeRef from "./hooks/useSizeRef";
 import { FaceResult, InputSource } from "./types";
@@ -61,10 +63,12 @@ export function ResultLayer({
   results: { resource: output, loading, lastStart, lastEnd },
   width,
   height,
+  transitions,
 }: {
   results: Resource<FaceResult[] | null>;
   width?: number;
   height?: number;
+  transitions: boolean;
 }) {
   return (
     <div
@@ -81,6 +85,7 @@ export function ResultLayer({
             results={output}
             width={width}
             height={height}
+            transitions={transitions}
           />
         )}
       </div>
@@ -171,15 +176,14 @@ export default function App() {
     withExpressions: true,
   });
   const model = useFaceApi(faceApiParams);
+  const readyForProcessing = !!mediaRef.current && !!model.resource;
   const [input, setInput] = React.useState<HTMLCanvasElement | null>(null);
   const setInputFromMedia = React.useCallback(() => {
     const media = mediaRef.current;
     setInput(media && createCanvasFromMediaOrNull(media));
   }, []);
-  const [autoPlay, setAutoPlay] = React.useState(!!hardware.resource?.hasWebGl);
-  React.useEffect(() => {
-    if (!autoPlay) setInput(null);
-  }, [autoPlay, mediaRef, model.resource]);
+  const [autoPlay, setAutoPlay] = React.useState(hasWebGl);
+  React.useEffect(() => setInput(null), [autoPlay, mediaRef, model.resource]);
   const processInput = React.useCallback(async () => {
     if (!input || !model.resource) return null;
     return model.resource.apply(input);
@@ -189,6 +193,15 @@ export default function App() {
     // to be able to show in the UI that the result is being computed
     delay: model.resource && input ? 100 : undefined,
   });
+
+  // In the auto-play mode, schedule the next model run after the previous has finished
+  React.useEffect(() => {
+    if (autoPlay && readyForProcessing && isCameraSource(inputSource)) {
+      const timeout = window.setTimeout(setInputFromMedia, 200);
+      return () => window.clearTimeout(timeout);
+    }
+  }, [output, autoPlay, setInputFromMedia, readyForProcessing, inputSource]);
+
   return (
     <div className="h-full relative">
       <InputLayer mediaRef={mediaRef} source={inputSource} />
@@ -196,12 +209,13 @@ export default function App() {
         results={output}
         width={mediaRef.current?.clientWidth}
         height={mediaRef.current?.clientHeight}
+        transitions={autoPlay}
       />
       <ControlsLayer
         autoPlay={autoPlay}
         toggleCamera={hasMultipleCameras ? toggleCamera : undefined}
         isWorking={output.loading}
-        isReady={!!mediaRef.current && !!model.resource}
+        isReady={readyForProcessing}
         onShoot={setInputFromMedia}
       />
       {hardware.resource && (
