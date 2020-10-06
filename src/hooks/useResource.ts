@@ -8,8 +8,6 @@ export interface Resource<T> {
   resource: T | null;
   error: null | Error;
   loading: boolean;
-  lastStart: Date; // last time the resource has started loading
-  lastEnd: Date; // last time resource has been completely loaded
 }
 
 interface ResourceProps {
@@ -33,14 +31,11 @@ export default function useResource<T>(
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<Error | null>(null);
   const [resource, setResource] = React.useState<T | null>(null);
-  const [lastStart, setLastStart] = React.useState(new Date());
-  const [lastEnd, setLastEnd] = React.useState(new Date());
   React.useEffect(() => {
     let delayTimeout: number | null = null;
     const loadResource = async () => {
       setLoading(true);
       setError(null);
-      setLastStart(new Date());
       if (delay)
         await new Promise(
           (res) => (delayTimeout = window.setTimeout(res, delay))
@@ -52,7 +47,6 @@ export default function useResource<T>(
         setError(e);
       }
       setLoading(false);
-      setLastEnd(new Date());
     };
     void loadResource();
     return () => {
@@ -61,5 +55,5 @@ export default function useResource<T>(
       else if (delayTimeout) window.clearTimeout(delayTimeout);
     };
   }, [load, cleanup, delay]);
-  return { loading, error, resource, lastStart, lastEnd };
+  return { loading, error, resource };
 }

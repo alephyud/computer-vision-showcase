@@ -54,7 +54,10 @@ export default function App() {
   // or the model have been changed
   const processInput = React.useCallback(async () => {
     if (!input || !model.resource) return null;
-    return model.resource.apply(input);
+    const startTime = new Date();
+    const result = await model.resource.apply(input);
+    const endTime = new Date();
+    return { startTime, endTime, result };
   }, [model.resource, input]);
   const output = useResource(processInput, {
     // NN runs in the main thread. We add a brief delay period before start
