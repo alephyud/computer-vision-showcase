@@ -43,6 +43,19 @@ export default function InputContainer({ source, mediaRef }: InputLayerProps) {
           }
         />
       )}
+      {camera.error && (
+        <div
+          className="text-white text-xl max-w-sm absolute"
+          style={{
+            left: "50%",
+            top: "50%",
+            transform: "translate(-50%, -50%)",
+          }}
+        >
+          <div className="mb-2">Camera access is disabled by your browser.</div>
+          To run this app, allow it to use the camera and refresh the page.
+        </div>
+      )}
     </div>
   );
 }

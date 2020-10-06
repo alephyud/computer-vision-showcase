@@ -61,6 +61,6 @@ export default function useFaceApi({
       return result as FaceResult[];
     }
     return { apply: applyModel };
-  }, [tiny, allFaces, withExpressions, withAgeAndGender]);
+  }, [tiny, allFaces, withExpressions, withAgeAndGender, scoreThreshold]);
   return useResource(getNeuralNetwork);
 }

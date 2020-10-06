@@ -5,7 +5,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import { FaceApiParams } from "../hooks/useFaceApi";
 import useHardwareCapabilities, {
-  HardwareInfo,
   hasWebGl,
 } from "../hooks/useHardwareCapabilities";
 import { UseState } from "../types";
