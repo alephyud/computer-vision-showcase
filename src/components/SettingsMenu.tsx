@@ -4,29 +4,34 @@ import { faTimes } from "@fortawesome/free-solid-svg-icons/faTimes";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import { FaceApiParams } from "../hooks/useFaceApi";
-import { HardwareInfo } from "../hooks/useHardwareCapabilities";
+import useHardwareCapabilities, {
+  HardwareInfo,
+  hasWebGl,
+} from "../hooks/useHardwareCapabilities";
 
 interface Props {
-  hardwareInfo: HardwareInfo;
   autoPlay: boolean;
   setAutoPlay: React.Dispatch<React.SetStateAction<boolean>>;
   faceApiParams: FaceApiParams;
   setFaceApiParams: React.Dispatch<React.SetStateAction<FaceApiParams>>;
 }
 
-const HardwareInfoView: React.FC<{ hardwareInfo: HardwareInfo }> = ({
-  hardwareInfo: { hasWebGl, cameras },
-}) => (
-  <>
-    <h3 className="my-2 text-lg">Your hardware</h3>
-    <div className="mt-1">
-      WebGL hardware acceleration {hasWebGl ? "supported" : "not supported"}.
-    </div>
-    <div className="mt-1">
-      You have {cameras.length} camera{cameras.length !== 1 && "s"}.
-    </div>
-  </>
-);
+const HardwareInfoView: React.FC<{}> = () => {
+  const { resource: hardwareInfo } = useHardwareCapabilities();
+  if (!hardwareInfo) return null;
+  const { hasWebGl, cameras } = hardwareInfo;
+  return (
+    <>
+      <h3 className="my-2 text-lg">Your hardware</h3>
+      <div className="mt-1">
+        WebGL hardware acceleration {hasWebGl ? "supported" : "not supported"}.
+      </div>
+      <div className="mt-1">
+        You have {cameras.length} camera{cameras.length !== 1 && "s"}.
+      </div>
+    </>
+  );
+};
 
 const Checkbox: React.FC<{
   state: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
@@ -47,7 +52,6 @@ const Checkbox: React.FC<{
 const menuWidth = 250;
 
 export default function SettingsMenu({
-  hardwareInfo,
   faceApiParams,
   setFaceApiParams,
   autoPlay,
@@ -94,7 +98,7 @@ export default function SettingsMenu({
       >
         <h2 className="my-2 text-xl">Settings</h2>
         <Checkbox state={localAutoPlay}>Scan in real time</Checkbox>
-        {!hardwareInfo.hasWebGl && (
+        {!hasWebGl && (
           <div className="text-sm">
             Note: real-time detection is not recommended on devices without
             hardware WebGL support; your UI can become unresponsive.
@@ -107,7 +111,7 @@ export default function SettingsMenu({
         </Checkbox>
         <Checkbox state={localWithAgeAndGender}>Detect gender and age</Checkbox>
         <Checkbox state={localAllFaces}>Allow multiple faces</Checkbox>
-        <HardwareInfoView hardwareInfo={hardwareInfo} />
+        <HardwareInfoView />
         <div className="mt-2">
           <a
             href="https://github.com/alephyud/computer-vision-showcase"

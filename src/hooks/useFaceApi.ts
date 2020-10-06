@@ -1,5 +1,6 @@
 import * as faceApi from "face-api.js";
 import * as React from "react";
+import { FaceResult } from "../types";
 import useResource from "./useResource";
 
 const MODELS_URI = "/face-api/weights";
@@ -11,32 +12,14 @@ const ensureModels = async (nets: faceApi.NeuralNetwork<unknown>[]) =>
     )
   );
 
-export type ApplyWithExpressions<
-  WithExpressions extends boolean,
-  T
-> = WithExpressions extends true ? faceApi.WithFaceExpressions<T> : T;
-
-export type ApplyWithAgeAndGender<
-  WithAgeAndGender extends boolean,
-  T
-> = WithAgeAndGender extends true ? faceApi.WithAge<faceApi.WithGender<T>> : T;
-
-export interface FaceApiParams<
-  AllFaces extends boolean = boolean,
-  WithExpressions extends boolean = boolean,
-  WithAgeAndGender extends boolean = boolean
-> {
+export interface FaceApiParams {
   tiny: boolean;
-  allFaces: AllFaces;
-  withExpressions: WithExpressions;
-  withAgeAndGender: WithAgeAndGender;
+  allFaces: boolean;
+  withExpressions: boolean;
+  withAgeAndGender: boolean;
 }
 
-export default function useFaceApi<
-  AllFaces extends boolean,
-  WithExpressions extends boolean,
-  WithAgeAndGender extends boolean
->(params: FaceApiParams<AllFaces, WithExpressions, WithAgeAndGender>) {
+export default function useFaceApi(params: FaceApiParams) {
   const { tiny, allFaces, withExpressions, withAgeAndGender } = params;
   const getNeuralNetwork = React.useCallback(async () => {
     const { nets } = faceApi;
@@ -50,6 +33,13 @@ export default function useFaceApi<
       ? new faceApi.TinyFaceDetectorOptions()
       : new faceApi.SsdMobilenetv1Options();
     async function applyModel(input: faceApi.TNetInput) {
+      /**
+       * Even in case if we use detectSingleFace, we wrap the result in an array
+       * to keep the format consistent for all cases.
+       * face-api.js return value is structured differently based on whether
+       * we require additional processing, so it's difficult to make TS infer
+       * the type for us in all cases.
+       */
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let task: any = (allFaces
         ? faceApi.detectAllFaces
@@ -62,13 +52,7 @@ export default function useFaceApi<
         result = result.map((rec: faceApi.FaceDetection) => ({
           detection: rec,
         }));
-      return result as ApplyWithAgeAndGender<
-        WithAgeAndGender,
-        ApplyWithExpressions<
-          WithExpressions,
-          { detection: faceApi.FaceDetection }
-        >
-      >[];
+      return result as FaceResult[];
     }
     return { apply: applyModel };
   }, [tiny, allFaces, withExpressions, withAgeAndGender]);
