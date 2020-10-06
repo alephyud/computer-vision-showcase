@@ -8,6 +8,7 @@ import useHardwareCapabilities, {
   HardwareInfo,
   hasWebGl,
 } from "../hooks/useHardwareCapabilities";
+import { UseState } from "../types";
 
 interface Props {
   autoPlay: boolean;
@@ -16,7 +17,7 @@ interface Props {
   setFaceApiParams: React.Dispatch<React.SetStateAction<FaceApiParams>>;
 }
 
-const HardwareInfoView: React.FC<{}> = () => {
+const HardwareInfoView: React.FC = () => {
   const { resource: hardwareInfo } = useHardwareCapabilities();
   if (!hardwareInfo) return null;
   const { hasWebGl, cameras } = hardwareInfo;
@@ -34,7 +35,7 @@ const HardwareInfoView: React.FC<{}> = () => {
 };
 
 const Checkbox: React.FC<{
-  state: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
+  state: UseState<boolean>;
 }> = ({ state: [value, setValue], children }) => (
   <div>
     <label>
@@ -46,6 +47,23 @@ const Checkbox: React.FC<{
       />
       {children}
     </label>
+  </div>
+);
+
+const Slider: React.FC<{
+  state: UseState<number>;
+}> = ({ state: [value, setValue], children }) => (
+  <div className="mt-1">
+    <input
+      type="range"
+      value={value}
+      min={0}
+      max={1}
+      step={0.01}
+      onChange={(e) => setValue(Number(e.currentTarget.value))}
+    />
+    {Math.round(value * 100) / 100}
+    <label className="block">{children}</label>
   </div>
 );
 
@@ -68,6 +86,7 @@ export default function SettingsMenu({
   const localAllFaces = React.useState(false);
   const localWithExpressions = React.useState(false);
   const localWithAgeAndGender = React.useState(false);
+  const localScoreThreshold = React.useState(0.5);
   const localAutoPlay = React.useState(false);
   const open = () => {
     // Load local state from outer component's state
@@ -75,6 +94,7 @@ export default function SettingsMenu({
     localAllFaces[1](faceApiParams.allFaces);
     localWithExpressions[1](faceApiParams.withExpressions);
     localWithAgeAndGender[1](faceApiParams.withAgeAndGender);
+    localScoreThreshold[1](faceApiParams.scoreThreshold);
     localAutoPlay[1](autoPlay);
     setAutoPlay(false);
     setShown(true);
@@ -85,6 +105,7 @@ export default function SettingsMenu({
       allFaces: localAllFaces[0],
       withExpressions: localWithExpressions[0],
       withAgeAndGender: localWithAgeAndGender[0],
+      scoreThreshold: localScoreThreshold[0],
     });
     setAutoPlay(localAutoPlay[0]);
     setShown(false);
@@ -111,6 +132,7 @@ export default function SettingsMenu({
         </Checkbox>
         <Checkbox state={localWithAgeAndGender}>Detect gender and age</Checkbox>
         <Checkbox state={localAllFaces}>Allow multiple faces</Checkbox>
+        <Slider state={localScoreThreshold}>Score threshold</Slider>
         <HardwareInfoView />
         <div className="mt-2">
           <a

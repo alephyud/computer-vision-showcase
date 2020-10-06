@@ -22,7 +22,12 @@ export default function ResultLayer({
     >
       <div>
         {!loading && output && (
-          <div>Done in {(lastEnd.getTime() - lastStart.getTime()) / 1000}s</div>
+          <>
+            <div>
+              {output.length} face{output.length !== 1 && "s"} | done in{" "}
+              {(lastEnd.getTime() - lastStart.getTime()) / 1000}s
+            </div>
+          </>
         )}
         {output && (
           <FaceDetectionResults

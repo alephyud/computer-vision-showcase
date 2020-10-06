@@ -87,11 +87,7 @@ export default function FaceDetectionResults({
       : results;
   return (
     <TransitionsClasses.Provider
-      value={
-        transitions || !transitions
-          ? "transition-all duration-300 ease-in-out"
-          : ""
-      }
+      value={transitions ? "transition-all duration-300 ease-in-out" : ""}
     >
       {resizedResults.map((result, index) => (
         <FaceOverlay key={index} result={result} />

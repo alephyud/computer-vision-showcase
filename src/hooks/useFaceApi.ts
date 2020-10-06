@@ -17,10 +17,16 @@ export interface FaceApiParams {
   allFaces: boolean;
   withExpressions: boolean;
   withAgeAndGender: boolean;
+  scoreThreshold: number;
 }
 
-export default function useFaceApi(params: FaceApiParams) {
-  const { tiny, allFaces, withExpressions, withAgeAndGender } = params;
+export default function useFaceApi({
+  tiny,
+  allFaces,
+  withExpressions,
+  withAgeAndGender,
+  scoreThreshold,
+}: FaceApiParams) {
   const getNeuralNetwork = React.useCallback(async () => {
     const { nets } = faceApi;
     const models: faceApi.NeuralNetwork<unknown>[] = [
@@ -30,8 +36,8 @@ export default function useFaceApi(params: FaceApiParams) {
     if (withAgeAndGender) models.push(nets.ageGenderNet);
     await ensureModels(models);
     const opts = tiny
-      ? new faceApi.TinyFaceDetectorOptions()
-      : new faceApi.SsdMobilenetv1Options();
+      ? new faceApi.TinyFaceDetectorOptions({ scoreThreshold })
+      : new faceApi.SsdMobilenetv1Options({ minConfidence: scoreThreshold });
     async function applyModel(input: faceApi.TNetInput) {
       /**
        * Even in case if we use detectSingleFace, we wrap the result in an array

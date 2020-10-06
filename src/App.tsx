@@ -31,6 +31,7 @@ export default function App() {
     allFaces: true,
     withAgeAndGender: true,
     withExpressions: true,
+    scoreThreshold: 0.3,
   });
   const model = useFaceApi(faceApiParams);
   const readyForProcessing = !!mediaRef.current && !!model.resource;
@@ -61,13 +62,18 @@ export default function App() {
     delay: model.resource && input ? 100 : undefined,
   });
 
-  // If the user device is fast enough, we can make the camera / NN cycle
+  // If the user's device is fast enough, we can make the camera / NN cycle
   // loop automatically; otherwise, it's better to let the user click the button
-  // to start processing
+  // to start processing.
   const [autoPlay, setAutoPlay] = React.useState(hasWebGl);
   React.useEffect(() => setInput(null), [autoPlay, mediaRef, model.resource]);
   React.useEffect(() => {
-    if (autoPlay && readyForProcessing && isCameraSource(inputSource)) {
+    if (
+      autoPlay &&
+      readyForProcessing &&
+      !output.loading &&
+      isCameraSource(inputSource)
+    ) {
       const timeout = window.setTimeout(setInputFromMedia, 200);
       return () => window.clearTimeout(timeout);
     }
