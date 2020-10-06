@@ -31,7 +31,7 @@ export default function App() {
     allFaces: true,
     withAgeAndGender: true,
     withExpressions: true,
-    scoreThreshold: 0.3,
+    scoreThreshold: 0.5,
   });
   const model = useFaceApi(faceApiParams);
   const readyForProcessing = !!mediaRef.current && !!model.resource;
