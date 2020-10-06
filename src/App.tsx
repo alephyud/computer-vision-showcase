@@ -189,6 +189,12 @@ export default function App() {
     // to be able to show in the UI that the result is being computed
     delay: model.resource && input ? 100 : undefined,
   });
+  React.useEffect(() => {
+    if (autoPlay && mediaRef.current && model.resource) {
+      const timeout = window.setTimeout(setInputFromMedia, 300);
+      return () => window.clearTimeout(timeout);
+    }
+  }, [output, autoPlay, model.resource, setInputFromMedia]);
   return (
     <div className="h-full relative">
       <InputLayer mediaRef={mediaRef} source={inputSource} />
