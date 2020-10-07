@@ -1,0 +1,6 @@
+{
+  "name": "Computer vision showcase",
+  "description": "A demo of face-api.js - more computer vision algorithms to be added",
+  "theme_color": "#000000",
+  "display": "fullscreen"
+}
