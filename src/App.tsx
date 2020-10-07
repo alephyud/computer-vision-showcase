@@ -9,6 +9,7 @@ import useHardwareCapabilities, {
   hasWebGl,
 } from "./hooks/useHardwareCapabilities";
 import useResource from "./hooks/useResource";
+import useWindowFocus from "./hooks/useWindowFocus";
 import { InputSource } from "./types";
 import { createCanvasFromMediaOrNull } from "./utils/media";
 
@@ -69,18 +70,27 @@ export default function App() {
   // loop automatically; otherwise, it's better to let the user click the button
   // to start processing.
   const [autoPlay, setAutoPlay] = React.useState(hasWebGl);
+  const focused = useWindowFocus();
   React.useEffect(() => setInput(null), [autoPlay, mediaRef, model.resource]);
   React.useEffect(() => {
     if (
       autoPlay &&
       readyForProcessing &&
       !output.loading &&
-      isCameraSource(inputSource)
+      isCameraSource(inputSource) &&
+      focused
     ) {
       const timeout = window.setTimeout(setInputFromMedia, 200);
       return () => window.clearTimeout(timeout);
     }
-  }, [output, autoPlay, setInputFromMedia, readyForProcessing, inputSource]);
+  }, [
+    output,
+    autoPlay,
+    setInputFromMedia,
+    readyForProcessing,
+    inputSource,
+    focused,
+  ]);
 
   return (
     <div className="h-full relative">
