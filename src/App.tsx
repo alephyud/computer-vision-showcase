@@ -32,6 +32,8 @@ export default function App() {
     allFaces: true,
     withAgeAndGender: true,
     withExpressions: true,
+    withDescriptors: false,
+    withLandmarks: true,
     scoreThreshold: 0.5,
   });
   const model = useFaceApi(faceApiParams);

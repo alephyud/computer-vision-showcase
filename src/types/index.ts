@@ -13,4 +13,8 @@ export type FaceResult = {
   age?: number;
   gender?: faceApi.Gender;
   expressions?: faceApi.FaceExpressions;
+  landmarks?: faceApi.FaceLandmarks;
+  unshiftedLandmarks?: faceApi.FaceLandmarks;
+  alignedRect?: faceApi.FaceDetection;
+  descriptor?: Float32Array;
 };

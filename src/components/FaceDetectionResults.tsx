@@ -53,7 +53,7 @@ interface ResultsOverlayProps {
 }
 
 const FaceOverlay: React.FC<{ result: FaceResult }> = ({
-  result: { detection, expressions, gender, age },
+  result: { detection, landmarks, expressions, gender, age },
 }) => (
   <div
     className={`border-4 border-white absolute rounded-lg ${React.useContext(
@@ -66,6 +66,21 @@ const FaceOverlay: React.FC<{ result: FaceResult }> = ({
       height: detection.box.height,
     }}
   >
+    <div>
+      {landmarks &&
+        landmarks.relativePositions.map(({ x, y }, i) => (
+          <div
+            key={i}
+            className="transition-classes absolute bg-green-800"
+            style={{
+              left: x * detection.box.width - 1,
+              top: y * detection.box.height - 1,
+              width: 3,
+              height: 3,
+            }}
+          />
+        ))}
+    </div>
     {age != null && gender && (
       <div className="bg-opacity-50 bg-white px-1 rounded-t">
         {Math.round(age)}, {gender}
