@@ -54,41 +54,42 @@ interface ResultsOverlayProps {
 
 const FaceOverlay: React.FC<{ result: FaceResult }> = ({
   result: { detection, landmarks, expressions, gender, age },
-}) => (
-  <div
-    className={`border-4 border-white absolute rounded-lg ${React.useContext(
-      TransitionsClasses
-    )}`}
-    style={{
-      left: detection.box.x,
-      width: detection.box.width,
-      top: detection.box.y,
-      height: detection.box.height,
-    }}
-  >
-    <div>
-      {landmarks &&
-        landmarks.relativePositions.map(({ x, y }, i) => (
-          <div
-            key={i}
-            className="transition-classes absolute bg-green-800"
-            style={{
-              left: x * detection.box.width - 1,
-              top: y * detection.box.height - 1,
-              width: 3,
-              height: 3,
-            }}
-          />
-        ))}
-    </div>
-    {age != null && gender && (
-      <div className="bg-opacity-50 bg-white px-1 rounded-t">
-        {Math.round(age)}, {gender}
+}) => {
+  const transitionClasses = React.useContext(TransitionsClasses);
+  return (
+    <div
+      className={`border-4 border-white absolute rounded-lg ${transitionClasses}`}
+      style={{
+        left: detection.box.x,
+        width: detection.box.width,
+        top: detection.box.y,
+        height: detection.box.height,
+      }}
+    >
+      <div>
+        {landmarks &&
+          landmarks.relativePositions.map(({ x, y }, i) => (
+            <div
+              key={i}
+              className={`${transitionClasses} absolute bg-green-800`}
+              style={{
+                left: x * detection.box.width - 1,
+                top: y * detection.box.height - 1,
+                width: 3,
+                height: 3,
+              }}
+            />
+          ))}
       </div>
-    )}
-    {expressions && <FaceExpressions expressions={expressions} />}
-  </div>
-);
+      {age != null && gender && (
+        <div className="bg-opacity-50 bg-white px-1 rounded-t">
+          {Math.round(age)}, {gender}
+        </div>
+      )}
+      {expressions && <FaceExpressions expressions={expressions} />}
+    </div>
+  );
+};
 
 export default function FaceDetectionResults({
   results,
