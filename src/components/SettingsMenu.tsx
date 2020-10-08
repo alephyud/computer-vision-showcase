@@ -85,6 +85,8 @@ export default function SettingsMenu({
   const localAllFaces = React.useState(false);
   const localWithExpressions = React.useState(false);
   const localWithAgeAndGender = React.useState(false);
+  const localWithLandmarks = React.useState(false);
+  const localWithDescriptors = React.useState(false);
   const localScoreThreshold = React.useState(0.5);
   const localAutoPlay = React.useState(false);
   const open = () => {
@@ -93,6 +95,8 @@ export default function SettingsMenu({
     localAllFaces[1](faceApiParams.allFaces);
     localWithExpressions[1](faceApiParams.withExpressions);
     localWithAgeAndGender[1](faceApiParams.withAgeAndGender);
+    localWithLandmarks[1](faceApiParams.withLandmarks);
+    localWithDescriptors[1](faceApiParams.withDescriptors);
     localScoreThreshold[1](faceApiParams.scoreThreshold);
     localAutoPlay[1](autoPlay);
     setAutoPlay(false);
@@ -104,6 +108,8 @@ export default function SettingsMenu({
       allFaces: localAllFaces[0],
       withExpressions: localWithExpressions[0],
       withAgeAndGender: localWithAgeAndGender[0],
+      withLandmarks: localWithLandmarks[0],
+      withDescriptors: localWithDescriptors[0],
       scoreThreshold: localScoreThreshold[0],
     });
     setAutoPlay(localAutoPlay[0]);
@@ -130,6 +136,9 @@ export default function SettingsMenu({
           Detect face expressions
         </Checkbox>
         <Checkbox state={localWithAgeAndGender}>Detect gender and age</Checkbox>
+        <Checkbox state={localWithLandmarks}>
+          Detect face landmark points
+        </Checkbox>
         <Checkbox state={localAllFaces}>Allow multiple faces</Checkbox>
         <Slider state={localScoreThreshold}>Score threshold</Slider>
         <HardwareInfoView />

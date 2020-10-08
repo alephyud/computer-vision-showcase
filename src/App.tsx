@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import ControlsOverlay from "./components/ControlsOverlay";
 import InputContainer from "./components/InputContainer";
 import ResultLayer from "./components/ResultsOverlay";
@@ -9,7 +9,6 @@ import useHardwareCapabilities, {
   hasWebGl,
 } from "./hooks/useHardwareCapabilities";
 import useResource from "./hooks/useResource";
-import useWindowFocus from "./hooks/useWindowFocus";
 import { InputSource } from "./types";
 import { createCanvasFromMediaOrNull } from "./utils/media";
 
@@ -32,6 +31,8 @@ export default function App() {
     allFaces: true,
     withAgeAndGender: true,
     withExpressions: true,
+    withDescriptors: false,
+    withLandmarks: true,
     scoreThreshold: 0.5,
   });
   const model = useFaceApi(faceApiParams);
@@ -70,18 +71,23 @@ export default function App() {
   // loop automatically; otherwise, it's better to let the user click the button
   // to start processing.
   const [autoPlay, setAutoPlay] = React.useState(hasWebGl);
-  const focused = useWindowFocus();
   React.useEffect(() => setInput(null), [autoPlay, mediaRef, model.resource]);
+  const [autoplayCounter, setAutoplayCounter] = useState(0);
+  React.useEffect(() => {
+    const interval = window.setInterval(
+      () => setAutoplayCounter((t) => t + 1),
+      1000
+    );
+    return () => clearInterval(interval);
+  }, []);
   React.useEffect(() => {
     if (
       autoPlay &&
       readyForProcessing &&
       !output.loading &&
-      isCameraSource(inputSource) &&
-      focused
+      isCameraSource(inputSource)
     ) {
-      const timeout = window.setTimeout(setInputFromMedia, 200);
-      return () => window.clearTimeout(timeout);
+      setInputFromMedia();
     }
   }, [
     output,
@@ -89,7 +95,7 @@ export default function App() {
     setInputFromMedia,
     readyForProcessing,
     inputSource,
-    focused,
+    autoplayCounter,
   ]);
 
   return (

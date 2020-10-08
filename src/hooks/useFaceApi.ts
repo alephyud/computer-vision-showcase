@@ -17,6 +17,8 @@ export interface FaceApiParams {
   allFaces: boolean;
   withExpressions: boolean;
   withAgeAndGender: boolean;
+  withDescriptors: boolean;
+  withLandmarks: boolean;
   scoreThreshold: number;
 }
 
@@ -25,6 +27,8 @@ export default function useFaceApi({
   allFaces,
   withExpressions,
   withAgeAndGender,
+  withDescriptors,
+  withLandmarks,
   scoreThreshold,
 }: FaceApiParams) {
   const getNeuralNetwork = React.useCallback(async () => {
@@ -34,6 +38,9 @@ export default function useFaceApi({
     ];
     if (withExpressions) models.push(nets.faceExpressionNet);
     if (withAgeAndGender) models.push(nets.ageGenderNet);
+    if (withLandmarks)
+      models.push(tiny ? nets.faceLandmark68Net : nets.faceLandmark68TinyNet);
+    if (withDescriptors) models.push(nets.faceRecognitionNet);
     await ensureModels(models);
     const opts = tiny
       ? new faceApi.TinyFaceDetectorOptions({ scoreThreshold })
@@ -50,6 +57,8 @@ export default function useFaceApi({
       let task: any = (allFaces
         ? faceApi.detectAllFaces
         : faceApi.detectSingleFace)(input, opts);
+      if (withLandmarks) task = task.withFaceLandmarks();
+      if (withDescriptors) task = task.withFaceDescriptors();
       if (withExpressions) task = task.withFaceExpressions();
       if (withAgeAndGender) task = task.withAgeAndGender();
       let result = await task;
@@ -61,6 +70,14 @@ export default function useFaceApi({
       return result as FaceResult[];
     }
     return { apply: applyModel };
-  }, [tiny, allFaces, withExpressions, withAgeAndGender, scoreThreshold]);
+  }, [
+    tiny,
+    allFaces,
+    withExpressions,
+    withAgeAndGender,
+    withDescriptors,
+    withLandmarks,
+    scoreThreshold,
+  ]);
   return useResource(getNeuralNetwork);
 }
