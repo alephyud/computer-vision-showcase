@@ -42,6 +42,6 @@ This app does not have a backend and it does not send any of your data outside t
 
 This is a list of things that one may want to try to add to this app:
 * Run the neural network in a service workers to avoid blocking the main thread. Apparently, service workers [don't have the same level of GPU access](https://github.com/justadudewhohacks/face-api.js/issues/47) that the main thread has, so the processing will take longer, but this is still an interesting exercise.
-* Expose other face-api.js features, i. e. face recognition and face landmark detection.
+* Expose other face-api.js features, i. e. face recognition and matching.
 * Add other interesting publicly available pre-trained TensorFlow models.
 * Add other computer vision algorithms. As an example [Tesseract](https://github.com/tesseract-ocr/tesseract) has a [JS port]((https://github.com/naptha/tesseract.js)) - it would be interesting to see how good it works in browser.
